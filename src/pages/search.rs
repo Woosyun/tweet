@@ -73,7 +73,10 @@ pub fn AuthButton() -> impl IntoView {
 
     let logout = Action::new(|_| {
         async move {
-            logout().await
+            match logout().await {
+                Ok(_) => window().location().reload().unwrap(),
+                Err(e) => window().alert_with_message(&e.to_string()).unwrap(),
+            }
         }
     });
     
@@ -122,10 +125,6 @@ pub async fn logout() -> Result<(), ServerFnError> {
     let user = auth_session
         .logout().await
         .map_err(ServerFnError::new)?;
-
-    //delete under after make page refresh to force component change reactively
-    let log = format!("maybe logout worked? user: {:?}", user);
-    dbg!(log);
     
     Ok(())
 }
@@ -170,14 +169,28 @@ pub fn TagBar() -> impl IntoView {
 
 #[component]
 pub fn MailEditor() -> impl IntoView {
+    let query = use_query_map();
     let (text, set_text) = signal(String::new());
+
+    let mail_action = Action::new(move |_| {
+        async move {
+            let content = text.get();
+            let tags = get_tags_from_query(&query.get());
+            match create_mail(content, Some(tags)).await {
+                Ok(_) => window().location().reload().unwrap(),
+                Err(error) => {
+                    window().alert_with_message(&error.to_string()).unwrap();
+                }
+            }
+        }
+    });
 
     view! {
         <form 
             class="mail-editor-container"
             on:submit=move |ev| {
                 ev.prevent_default();
-                leptos::logging::log!("input: {}", text.get());
+                mail_action.dispatch(());
             }
         >
             <input type="text" bind:value=(text, set_text)/>

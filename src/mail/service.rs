@@ -36,6 +36,8 @@ impl MailService {
         let options = FindOptions::builder()
             .limit(10)
             .build();
+
+        //TODO: return all items when tags is empty vector
         let query = bson::doc! {"tags": { "$all": tags}};
 
         self.collection.find(query)

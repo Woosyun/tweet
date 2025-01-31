@@ -70,7 +70,6 @@ impl Backend {
         }
     }
 
-    //TODO: implement register, find_one
     pub async fn register(&self, new_user: User) -> Result<(), String> {
         let user = self.users.find_one_by_user_id(new_user.user_id.clone()).await
             .map_err(|e| e.to_string())?;
