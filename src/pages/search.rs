@@ -10,10 +10,12 @@ use leptos_router::{
 #[component] 
 pub fn Page() -> impl IntoView {
     view! {
-        <SearchBar />
-        <TagBar />
-        <MailEditor />
-        <SearchResultViewer />
+        <div id="search-container">
+            <TopBar />
+            <TagBar />
+            <MailEditor />
+            <SearchResultViewer />
+        </div>
     }
 }
 
@@ -30,7 +32,7 @@ pub fn get_tags_from_query(q: &ParamsMap) -> Vec<String> {
 }
 
 #[component] 
-pub fn SearchBar() -> impl IntoView {
+pub fn TopBar() -> impl IntoView {
     let query = use_query_map();
     let input_ref: NodeRef<Input> = NodeRef::new();
 
@@ -74,24 +76,21 @@ pub fn AuthButton() -> impl IntoView {
             logout().await
         }
     });
-    let login_button = move |_| {
-        view! {
-            <A href="/login">login</A>
-        }
-    };
     
     view! {
         <Suspense fallback=move || view! {<span>"..."</span>}>
-            <ErrorBoundary fallback=login_button>
-                {move || {
-                    authenticated.get().map(|_| {
-                        view! {
-                            <button on:click=move |_| { logout.dispatch(()); }>logout</button>
-                        }
+        <ErrorBoundary fallback=move |_err| view! {
+            <A href="/login">login</A>
+        }>
+            {move || authenticated
+                .get().map(|re| {
+                    re.map(|_| view! {
+                        <button on:click=move |_| { logout.dispatch(()); }>
+                            logout
+                        </button>
                     })
-                }}
-            </ErrorBoundary>
-            // {move || authenticated.get().map(auth_button)}
+                })}
+        </ErrorBoundary>
         </Suspense>
     }
 }
@@ -105,8 +104,7 @@ pub async fn authenticate() -> Result<(), ServerFnError> {
     let auth_session: AuthSession<Backend> = extract().await?;
     
     match auth_session.user {
-        Some(user) => {
-            dbg!(user.user_name);
+        Some(_) => {
             Ok(())
         },
         None => Err(ServerFnError::new("UNAUTHORIZED")),
@@ -121,9 +119,12 @@ pub async fn logout() -> Result<(), ServerFnError> {
 
     let mut auth_session: AuthSession<Backend> = extract().await?;
 
-    auth_session.logout().await.map_err(ServerFnError::new)?;
+    let user = auth_session
+        .logout().await
+        .map_err(ServerFnError::new)?;
 
-    let log = format!("maybe logout worked?");
+    //delete under after make page refresh to force component change reactively
+    let log = format!("maybe logout worked? user: {:?}", user);
     dbg!(log);
     
     Ok(())
@@ -172,14 +173,42 @@ pub fn MailEditor() -> impl IntoView {
     let (text, set_text) = signal(String::new());
 
     view! {
-        <form on:submit=move |ev| {
-            ev.prevent_default();
-            leptos::logging::log!("input: {}", text.get());
-        }>
+        <form 
+            class="mail-editor-container"
+            on:submit=move |ev| {
+                ev.prevent_default();
+                leptos::logging::log!("input: {}", text.get());
+            }
+        >
             <input type="text" bind:value=(text, set_text)/>
             <input type="submit" value="send" />
         </form>
     }
+}
+
+#[server]
+async fn create_mail(content: String, tags: Option<Vec<String>>) -> Result<(), ServerFnError> {
+    use crate::AppState;
+    use leptos::prelude::use_context;
+    use axum_login::AuthSession;
+    use leptos_axum::extract;
+    use crate::auth::Backend;
+
+    let auth_session: AuthSession<Backend> = extract().await?;
+    let user_id = match auth_session.user {
+        Some(user) => user.user_id,
+        None => return Err(ServerFnError::new("Unauthorized"))
+    };
+
+    let tags = tags
+        .unwrap_or_default();
+    
+    use_context::<AppState>()
+        .expect("cannot extract appstate")
+        .db.mail_service
+        .insert_one(mail::Mail::new(user_id, content, tags))
+        .await.map_err(ServerFnError::new)
+        .map(|_| ())
 }
 
 #[component] 

@@ -2,3 +2,50 @@ body {
 	font-family: sans-serif;
 	text-align: center;
 }
+
+#search-container {
+  display: flex;
+  flex-direction: column;
+}
+
+input {
+    outline: none;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(128, 128, 128, 0.386);
+}
+input:focus {
+    border-color: black;
+}
+button {
+    outline: none;
+    padding: 0.5rem;
+    border: 1px solid transparent;
+    border-radius: 0.5rem;
+}
+button:hover {
+    cursor: pointer;
+    border-color: black;
+}
+
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.badge {
+    margin: 0.5rem;
+}
+.badge:hover {
+    color: red;
+    cursor: pointer;
+}
+
+.mail-editor-container {
+    display: flex;
+    flex-direction: column;
+    width: full;
+    height: full;
+    border: 1px solid black;
+}

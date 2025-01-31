@@ -13,6 +13,15 @@ pub struct Mail {
 }
 
 impl Mail {
+    pub fn new(author_id: String, body: String, tags: Vec<String>) -> Self {
+        Self {
+            id: String::from(""),
+            author_id,
+            body,
+            tags,
+            last_modified: String::from(""),
+        }
+    }
     pub fn set_id(&mut self, id: String) {
         self.id = id;
     }

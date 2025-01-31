@@ -35,7 +35,7 @@ async fn main() {
 
     //db setting
     let conn = DB::connect().await
-        .expect("db connectiont gone wrong");
+        .expect("db connection gone wrong");
     let appstate = AppState {
         db: DB::new(&conn).await.expect("cannot create db service"),
         leptos_options: leptos_options.clone()
