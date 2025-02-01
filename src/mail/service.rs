@@ -23,7 +23,6 @@ impl MailService {
 
     pub async fn insert_one(&self, mut mail: Mail) -> Result<InsertOneResult, Error> {
         mail.set_id(bson::oid::ObjectId::new().to_hex());
-        mail.set_last_modified(bson::DateTime::now().to_string());
         self.collection.insert_one(mail).await
     }
 
@@ -35,7 +34,7 @@ impl MailService {
         
         let options = FindOptions::builder()
             .limit(30)
-            .sort(bson::doc! { "last_modified": -1 })
+            .sort(bson::doc! { "created_at": -1 })
             .build();
 
         let query = if tags.is_empty() {

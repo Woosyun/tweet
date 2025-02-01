@@ -1,5 +1,7 @@
 use serde::{Serialize, Deserialize};
 use leptos::prelude::*;
+use crate::mail::time::IntoRelativeTime;
+use bson::DateTime;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Mail {
@@ -9,7 +11,7 @@ pub struct Mail {
     pub body: String,
     #[serde(default)]
     pub tags: Vec<String>,
-    pub last_modified: String,
+    pub created_at: DateTime,
 }
 
 impl Mail {
@@ -19,14 +21,11 @@ impl Mail {
             author_id,
             body,
             tags,
-            last_modified: String::from(""),
+            created_at: DateTime::now(),
         }
     }
     pub fn set_id(&mut self, id: String) {
         self.id = id;
-    }
-    pub fn set_last_modified(&mut self, cur: String) {
-        self.last_modified = cur;
     }
 }
 
@@ -34,14 +33,22 @@ impl IntoRender for Mail {
     type Output = AnyView;
 
     fn into_render(self) -> Self::Output {
+        let relative_time = self.into_relative_time();
+
         view! {
             <div>
                 <p class="text-sm">
                     <span class="text-inherit">{self.author_id}</span>
-                    <span class="ml-4 text-inherit">{self.last_modified}</span>
+                    <span class="ml-4 text-inherit">{relative_time}</span>
                 </p>
                 <p>{self.body}</p>
             </div>
         }.into_any()
+    }
+}
+
+impl IntoRelativeTime for Mail {
+    fn get_created_at(&self) -> DateTime {
+        self.created_at
     }
 }
