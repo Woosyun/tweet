@@ -10,7 +10,7 @@ use leptos_router::{
 #[component] 
 pub fn Page() -> impl IntoView {
     view! {
-        <div class="flex-col gap-4 w-4/5 m-auto">
+        <div class="flex flex-col gap-4 w-4/5 mx-auto mt-4">
             <TopBar />
             <TagBar />
             <MailEditor />
@@ -38,7 +38,7 @@ pub fn TopBar() -> impl IntoView {
 
     view! {
         <div class="flex justify-between gap-4">
-            <h1 class="btn-gray-ish">Home</h1>
+            <a href="/" class="link-gray-ish">Home</a>
 
             <form class="flex gap-2" on:submit=move |ev| {
                 ev.prevent_default();
@@ -193,6 +193,7 @@ pub fn MailEditor() -> impl IntoView {
 
     view! {
         <form 
+            class="flex gap-4"
             on:submit=move |ev| {
                 ev.prevent_default();
                 mail_action.dispatch(());
@@ -239,17 +240,19 @@ pub fn SearchResultViewer() -> impl IntoView {
     });
     
     view! {
-        <Transition fallback=move || view! { <p>"searching commits..."</p>}>
-        <ErrorBoundary fallback=move |_| view! {<h1>"error while searching"</h1>}>
-        {move || {
-            items.get().map(|re| {
-                re.map(|items| {
-                    items.into_iter().map(IntoRender::into_render).collect_view()
+        <div class="w-full h-full flex flex-col gap-2 justify-center">
+            <Transition fallback=move || view! { <p>"searching commits..."</p>}>
+            <ErrorBoundary fallback=move |_| view! {<h1>"error while searching"</h1>}>
+            {move || {
+                items.get().map(|re| {
+                    re.map(|items| {
+                        items.into_iter().map(IntoRender::into_render).collect_view()
+                    })
                 })
-            })
-        }}
-        </ErrorBoundary>
-        </Transition>
+            }}
+            </ErrorBoundary>
+            </Transition>
+        </div>
     }
 }
 

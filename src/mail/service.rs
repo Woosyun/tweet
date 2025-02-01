@@ -34,11 +34,15 @@ impl MailService {
     pub async fn find_by_tags(&self, tags: Vec<String>) -> Result<Vec<Mail>, Error> {
         
         let options = FindOptions::builder()
-            .limit(10)
+            .limit(30)
+            .sort(bson::doc! { "last_modified": -1 })
             .build();
 
-        //TODO: return all items when tags is empty vector
-        let query = bson::doc! {"tags": { "$all": tags}};
+        let query = if tags.is_empty() {
+            bson::doc! {} 
+        } else {
+            bson::doc! {"tags": { "$all": tags }}
+        };
 
         self.collection.find(query)
             .with_options(options)

@@ -36,9 +36,9 @@ impl IntoRender for Mail {
     fn into_render(self) -> Self::Output {
         view! {
             <div>
-                <p>
-                    <span>{self.author_id}</span>
-                    <span>{self.last_modified}</span>
+                <p class="text-sm">
+                    <span class="text-inherit">{self.author_id}</span>
+                    <span class="ml-4 text-inherit">{self.last_modified}</span>
                 </p>
                 <p>{self.body}</p>
             </div>
