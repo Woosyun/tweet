@@ -27,21 +27,23 @@ pub fn Page() -> impl IntoView {
     };
     
     view! {
-        <form on:submit=register>
-            <label>
-                "user id"
-                <input type="text" node_ref=id_ref />
-            </label>
-            <label>
-                "password"
-                <input type="text" node_ref=pw_ref />
-            </label>
-            <label>
-                "user name"
-                <input type="text" node_ref=name_ref />
-            </label>
-            <input type="submit" value="register"/>
-        </form>
+        <div class="w-svw h-svh flex flex-col gap-4 justify-center items-center">
+            <form class="flex flex-col gap-4" on:submit=register>
+                <label class="flex flex-col gap-2">
+                    "user id"
+                    <input type="text" node_ref=id_ref class="input-gray-ish"/>
+                </label>
+                <label class="flex flex-col gap-2">
+                    "password"
+                    <input type="text" node_ref=pw_ref class="input-gray-ish" />
+                </label>
+                <label class="flex flex-col gap-2">
+                    "user name"
+                    <input type="text" node_ref=name_ref class="input-gray-ish" />
+                </label>
+                <input type="submit" value="register" class="btn-gray-ish" />
+            </form>
+        </div>
     }
 }
 

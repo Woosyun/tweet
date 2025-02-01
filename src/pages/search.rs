@@ -10,7 +10,7 @@ use leptos_router::{
 #[component] 
 pub fn Page() -> impl IntoView {
     view! {
-        <div id="search-container">
+        <div class="flex-col gap-4 w-4/5 m-auto">
             <TopBar />
             <TagBar />
             <MailEditor />
@@ -37,10 +37,10 @@ pub fn TopBar() -> impl IntoView {
     let input_ref: NodeRef<Input> = NodeRef::new();
 
     view! {
-        <div class="topbar">
-            <h1>Home</h1>
+        <div class="flex justify-between gap-4">
+            <h1 class="btn-gray-ish">Home</h1>
 
-            <form on:submit=move |ev| {
+            <form class="flex gap-2" on:submit=move |ev| {
                 ev.prevent_default();
 
                 let input = input_ref.get().expect("missing input_ref").value();
@@ -56,8 +56,8 @@ pub fn TopBar() -> impl IntoView {
         
                 window().location().set_search(&query).unwrap();
             }>
-                <input type="search" node_ref=input_ref/>
-                <input type="submit" value="search" />
+                <input type="search" node_ref=input_ref class="input-gray-ish"/>
+                <input type="submit" value="search" class="btn-gray-ish"/>
             </form>
             
             <AuthButton />
@@ -81,20 +81,26 @@ pub fn AuthButton() -> impl IntoView {
     });
     
     view! {
-        <Suspense fallback=move || view! {<span>"..."</span>}>
-        <ErrorBoundary fallback=move |_err| view! {
-            <A href="/login">login</A>
-        }>
-            {move || authenticated
-                .get().map(|re| {
-                    re.map(|_| view! {
-                        <button on:click=move |_| { logout.dispatch(()); }>
-                            logout
-                        </button>
-                    })
-                })}
-        </ErrorBoundary>
-        </Suspense>
+        <div 
+            class="btn-gray-ish"
+        >
+            <Suspense fallback=move || view! {<span>"..."</span>}>
+            <ErrorBoundary fallback=move |_err| view! {
+                <A href="/login">login</A>
+            }>
+                {move || authenticated
+                    .get().map(|re| {
+                        re.map(|_| view! {
+                            <button 
+                                on:click=move |_| { logout.dispatch(()); }
+                            >
+                                logout
+                            </button>
+                        })
+                    })}
+            </ErrorBoundary>
+            </Suspense>
+        </div>
     }
 }
 
@@ -122,7 +128,7 @@ pub async fn logout() -> Result<(), ServerFnError> {
 
     let mut auth_session: AuthSession<Backend> = extract().await?;
 
-    let user = auth_session
+    let _user = auth_session
         .logout().await
         .map_err(ServerFnError::new)?;
     
@@ -153,11 +159,11 @@ pub fn TagBar() -> impl IntoView {
     };
 
     view! {
-        <div class="tagbar">
+        <div class="flex gap-2 justify-center">
             <For each=tags key=|tag| tag.clone() children=move |tag: String| {
                 let tag0 = tag.clone();
                 view! {
-                    <span class="badge" on:click=move |ev| {
+                    <span class="hover:text-red-400 hover:cursor-pointer" on:click=move |ev| {
                         ev.prevent_default();
                         delete_tag(tag0.clone());
                     }>{tag}</span>
@@ -187,14 +193,13 @@ pub fn MailEditor() -> impl IntoView {
 
     view! {
         <form 
-            class="mail-editor-container"
             on:submit=move |ev| {
                 ev.prevent_default();
                 mail_action.dispatch(());
             }
         >
-            <input type="text" bind:value=(text, set_text)/>
-            <input type="submit" value="send" />
+            <input type="text" bind:value=(text, set_text) class="input-gray-ish"/>
+            <input type="submit" value="upload" class="btn-gray-ish"/>
         </form>
     }
 }
@@ -236,21 +241,13 @@ pub fn SearchResultViewer() -> impl IntoView {
     view! {
         <Transition fallback=move || view! { <p>"searching commits..."</p>}>
         <ErrorBoundary fallback=move |_| view! {<h1>"error while searching"</h1>}>
-        <ul>
-            {move || {
-                items.get().map(|re| {
-                    re.map(|items| {
-                        items.into_iter().map(|item| {
-                            view! {
-                                <li>
-                                    {item}
-                                </li>
-                            }.into_any()
-                        }).collect_view()
-                    })
+        {move || {
+            items.get().map(|re| {
+                re.map(|items| {
+                    items.into_iter().map(IntoRender::into_render).collect_view()
                 })
-            }}
-        </ul>
+            })
+        }}
         </ErrorBoundary>
         </Transition>
     }

@@ -1,6 +1,6 @@
+/*
 body {
 	font-family: sans-serif;
-	text-align: center;
 }
 
 #search-container {
@@ -48,4 +48,56 @@ button:hover {
     width: full;
     height: full;
     border: 1px solid black;
+}
+.mail-container {
+  display: flex;
+  flex-direction: column;
+  width: full;
+  height: full;
+  border: 1px solid transparent;
+}
+.mail-container:hover {
+  border: 1px solid black;
+}
+*/
+/*@layer theme, base, components, utilities;*/
+/*
+@layer components {
+  .btn-gray-ish {
+    @apply px-2 py-1 bg-gray-300 text-gray-500 border border-gray-400 rounded shadow-md 
+           hover:bg-gray-100 active:bg-gray-200 focus:outline-none focus:ring-2 
+           focus:ring-gray-600 font-serif text-md hover:cursor-pointer;
+  }
+  .input-gray-ish {
+    @apply px-4 py-2 bg-gray-100 text-gray-800 border border-gray-500 rounded shadow-md 
+            focus:outline-none focus:ring-2 focus:ring-gray-600 font-serif text-lg
+  }
+}
+  */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --btn-bg: theme(colors.gray.300);
+  --btn-border: theme(colors.gray.500);
+}
+
+.btn-gray-ish {
+    background-color: var(--btn-bg);
+    border-color: var(--btn-border);
+    @apply px-1 py-1 bg-gray-100 text-gray-500 border border-gray-400 rounded shadow-md 
+        hover:bg-gray-300 active:bg-gray-300 focus:outline-none focus:ring-2 
+        focus:ring-gray-600 font-serif text-sm hover:cursor-pointer
+}
+
+.input-gray-ish {
+    @apply px-1 py-1 bg-gray-100 text-gray-800 border border-gray-500 rounded shadow-md 
+        focus:outline-none focus:ring-2 focus:ring-gray-600 font-serif text-base
+}
+
+.link-gray-ish {
+    @apply px-1 py-2 bg-gray-300 text-gray-800 border border-gray-500 rounded shadow-md 
+        hover:bg-gray-400 active:bg-gray-500 focus:outline-none focus:ring-2 
+        focus:ring-gray-600 font-serif text-base
 }

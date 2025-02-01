@@ -36,9 +36,11 @@ impl IntoRender for Mail {
     fn into_render(self) -> Self::Output {
         view! {
             <div>
-                <span>{self.author_id}</span>
+                <p>
+                    <span>{self.author_id}</span>
+                    <span>{self.last_modified}</span>
+                </p>
                 <p>{self.body}</p>
-                <span>{self.last_modified}</span>
             </div>
         }.into_any()
     }
