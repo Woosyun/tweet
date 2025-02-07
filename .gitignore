@@ -21,3 +21,4 @@ playwright/.cache/
 
 .env
 .node_modules
+Dockerfile

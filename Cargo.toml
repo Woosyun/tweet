@@ -29,6 +29,8 @@ dotenv = "0.15.0"
 time = "0.3.37"
 chrono = "0.4.39"
 bson = { version = "2.13.0", features = ["chrono-0_4"] }
+#getrandom = { version = "0.2.15", features = ["wasm_js"] }
+uuid = { version = "1.13.1", features = ["v4", "js"] }
 
 [features]
 hydrate = [
